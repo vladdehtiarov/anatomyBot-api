@@ -2,14 +2,18 @@ const express = require('express');
 const app = express();
 const port = process.env.PORT || 3000;
 
-app.use(express.json());
+// Додаємо можливість парсити text/plain
+app.use(express.text({ type: '*/*' }));
 
 app.post('/escape', (req, res) => {
-  const { text } = req.body;
-  if (!text) return res.status(400).json({ error: 'No text provided' });
+  const rawText = req.body;
 
-  const escapedText = JSON.stringify(text);
-  res.json({ escaped: escapedText });
+  if (typeof rawText !== 'string') {
+    return res.status(400).json({ error: 'Expected raw text as plain text' });
+  }
+
+  const escaped = JSON.stringify(rawText);
+  res.json({ escaped });
 });
 
 app.get('/', (req, res) => {
